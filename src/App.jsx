@@ -10,7 +10,7 @@ function App() {
   const [input, setInput] = useState('')
 
   function getApi() {
-    axios.get(`https://api.themoviedb.org/3/search/movie?api_key=${api_key}&query=il+signore+degli+anelli`)
+    axios.get(`https://api.themoviedb.org/3/search/movie?api_key=${api_key}&query=${input}`)
       .then(res => (
         setApi(res.data.results)
       ))
@@ -18,20 +18,21 @@ function App() {
 
   console.log(api);
 
-  useEffect((getApi), [])
+  // useEffect((getApi), [])
 
   return (
     <>
+
       {/* <BrowserRouter>
         <Routes>
           <Route></Route>
         </Routes>
       </BrowserRouter> */}
-      <div className='container'>
-        <input type="search" name="" id="" onChange={(e) => setInput(e.target.value)} />
-        <button className='btn btn-primary'>search</button>
-      </div>
 
+      <div className='container'>
+        <input type="search" value={input} id="" onChange={(e) => setInput(e.target.value)} />
+        <button className='btn btn-primary' onClick={getApi}>search</button>
+      </div>
 
       {api.map((film) => (
         <div key={film.id}>
