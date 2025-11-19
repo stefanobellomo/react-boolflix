@@ -24,7 +24,6 @@ function App() {
   }
 
   useEffect(getFilmSeries, [])
-  console.log(film);
 
   const [everyOpere, setEveryOpere] = useState([])
   const [results, setResults] = useState(everyOpere)
@@ -33,13 +32,29 @@ function App() {
   useEffect(() => {
     setEveryOpere([...film, ...series]
     )
-    console.log(everyOpere);
   }, [film, series])
 
   function handleClick() {
     const filteredOpere = everyOpere.filter(opera => (opera.title || opera.name).toLowerCase().includes(input))
     setResults(filteredOpere)
   }
+
+  function getStars(vote) {
+    const stars = []
+    const decVote = Math.ceil(vote / 2)
+    const numbs = [1, 2, 3, 4, 5]
+
+    numbs.forEach(numb => {
+      if (numb <= decVote) {
+        stars.push('★')
+      } else {
+        stars.push('☆')
+      }
+    })
+    return stars.join('')
+  }
+
+  console.log(results);
 
   return (
     <>
@@ -51,9 +66,10 @@ function App() {
       {results.map((film) => (
         <div key={film.id}>
           <p>{film.title || film.name}</p>
+          <img src={`https://image.tmdb.org/t/p/w342${film.poster_path}`} alt="" />
           <p>{film.release_date}</p>
           <p>{film.original_language === 'it' ? <img width='25px' src={ita}></img> : film.original_language}</p>
-          <p>{film.vote_average}</p>
+          <p>{getStars(film.vote_average)}</p>
         </div>
       ))}
     </>
