@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import axios from 'axios'
 import ita from './assets/ita_flags.jpeg'
 import { useEffect, useState } from 'react'
@@ -11,32 +12,25 @@ function App() {
   const [film, setFilm] = useState([])
   const [series, setSeries] = useState([])
 
-
-  function getFilmSeries() {
-    axios.get(`https://api.themoviedb.org/3/search/movie?api_key=${api_key}&query=matrix`)
-      .then(resFilm => {
-        setFilm(resFilm.data.results)
-      })
-    axios.get(`https://api.themoviedb.org/3/search/tv?api_key=${api_key}&query=scrubs`)
-      .then(resSeries => {
-        setSeries(resSeries.data.results)
-      })
-  }
-
-  useEffect(getFilmSeries, [])
-
   const [everyOpere, setEveryOpere] = useState([])
   const [results, setResults] = useState(everyOpere)
 
-
-  useEffect(() => {
-    setEveryOpere([...film, ...series]
-    )
-  }, [film, series])
-
   function handleClick() {
-    const filteredOpere = everyOpere.filter(opera => (opera.title || opera.name).toLowerCase().includes(input))
-    setResults(filteredOpere)
+    axios.get(`https://api.themoviedb.org/3/search/movie?api_key=${api_key}&query=${input}`)
+      .then(resFilm => {
+        const films = resFilm.data.results
+        axios.get(`https://api.themoviedb.org/3/search/tv?api_key=${api_key}&query=${input}`)
+          .then(resSeries => {
+            const tvSeries = resSeries.data.results
+
+            const all = [...films, ...tvSeries]
+
+            setFilm(films)
+            setSeries(tvSeries)
+            setEveryOpere(all)
+            setResults(all)
+          })
+      })
   }
 
   function getStars(vote) {
@@ -58,20 +52,41 @@ function App() {
 
   return (
     <>
-      <div className='container'>
-        <input type="search" value={input} id="" onChange={(e) => setInput(e.target.value)} />
-        <button className='btn btn-primary' onClick={handleClick}>search</button>
-      </div>
+      <header>
+        <nav className="navbar navbar-expand-sm navbar-light bg-primary">
+          <div className="container-fluid">
+            <div className="collapse navbar-collapse" id="navbarID">
+              <div className="navbar-nav">
+                <input type="search" value={input} onChange={(e) => setInput(e.target.value)} />
+              </div>
+              <button className='btn btn-primary' onClick={handleClick}>search</button>
+            </div>
+          </div>
+        </nav>
+      </header>
 
-      {results.map((film) => (
-        <div key={film.id}>
-          <p>{film.title || film.name}</p>
-          <img src={`https://image.tmdb.org/t/p/w342${film.poster_path}`} alt="" />
-          <p>{film.release_date}</p>
-          <p>{film.original_language === 'it' ? <img width='25px' src={ita}></img> : film.original_language}</p>
-          <p>{getStars(film.vote_average)}</p>
+      <main>
+        <div className='container'>
+          <div className='row row-cols-3'>
+
+            {results.map((opera) => (
+              <div className='col' key={opera.id}>
+                <div className='card'>
+                  <p>{opera.title || opera.name}</p>
+                  <img src={`https://image.tmdb.org/t/p/w342${opera.poster_path}`} alt="" />
+                  <p>{opera.release_date || opera.first_air_date}</p>
+                  <p>{opera.original_language === 'it' ? <img src={ita}></img> : opera.original_language}</p>
+                  <p>{getStars(opera.vote_average)}</p>
+                </div>
+              </div>
+            ))}
+
+          </div>
         </div>
-      ))}
+
+      </main>
+
+
     </>
   )
 }
@@ -83,3 +98,7 @@ export default App
 //     <Route></Route>
 //   </Routes>
 // </BrowserRouter>
+// <div className='container'>
+//   <input type="search" value={input} onChange={(e) => setInput(e.target.value)} />
+//   <button className='btn btn-primary' onClick={handleClick}>search</button>
+// </div> 
