@@ -1,8 +1,9 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { NavLink } from 'react-router-dom'
 import axios from 'axios'
-import ita from './assets/ita_flags.jpeg'
 import { useEffect, useState } from 'react'
+import ReactCountryFlag from "react-country-flag";
+
 
 function App() {
 
@@ -48,6 +49,27 @@ function App() {
     return stars.join('')
   }
 
+  const langToCountry = {
+    it: "IT",
+    en: "GB",
+    fr: "FR",
+    es: "ES",
+    de: "DE",
+    ja: "JP",
+    ko: "KR",
+    zh: "CN",
+    ru: "RU",
+    pt: "PT",
+  };
+
+  function renderFlag(lang) {
+    const countryCode = langToCountry[lang];
+    if (!countryCode) return lang;
+    return (
+      <ReactCountryFlag countryCode={countryCode} svg />
+    );
+  }
+
   console.log(results);
 
   return (
@@ -75,7 +97,7 @@ function App() {
                   <p>{opera.title || opera.name}</p>
                   <img src={`https://image.tmdb.org/t/p/w342${opera.poster_path}`} alt="" />
                   <p>{opera.release_date || opera.first_air_date}</p>
-                  <p>{opera.original_language === 'it' ? <img src={ita}></img> : opera.original_language}</p>
+                  <div className='flags'>{renderFlag(opera.original_language)}</div>
                   <p>{getStars(opera.vote_average)}</p>
                 </div>
               </div>
@@ -85,7 +107,6 @@ function App() {
         </div>
 
       </main>
-
 
     </>
   )
@@ -98,7 +119,4 @@ export default App
 //     <Route></Route>
 //   </Routes>
 // </BrowserRouter>
-// <div className='container'>
-//   <input type="search" value={input} onChange={(e) => setInput(e.target.value)} />
-//   <button className='btn btn-primary' onClick={handleClick}>search</button>
-// </div> 
+
